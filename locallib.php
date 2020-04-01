@@ -42,6 +42,7 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
     $page = 1;
     // Maximum number of pages to request to avoid possible infinite loop.
     $loop_limit = 100;
+    $redirecturl = $CFG->wwwroot.'/my/';
 
     $api = new Api($CFG->accredible_api_key);
 
@@ -76,6 +77,17 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
 
         // Limit the number of returned credentials.
         $credentials = array_slice($allcredentials, 0, $limit);
+
+        // Get the wallet url.
+        $link = $api->recipient_sso_link(null, null, $email, true, $group_id, $redirecturl);
+        $walleturl = $link->link;
+
+        // Get the SSO link for these credentials and attach wallet url.
+        foreach ($credentials as $credential) {
+            $link = $api->recipient_sso_link($credential->id, null, null, null, null, $redirecturl);
+            $credentials[$credential->id]->sso_url = $link->link;
+            $credentials[$credential->id]->wallet_url = $walleturl;
+        }
 
         return $credentials;
 	} catch (ClientException $e) {

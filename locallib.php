@@ -32,9 +32,10 @@ use ACMS\Api;
  *
  * @param string $group_id Limit the returned Credentials to a specific group ID.
  * @param string|null $email Limit the returned Credentials to a specific recipient's email address.
+ * @param int Maximum number of credentials to return (in order to limit the number on dashboard).
  * @return array[stdClass] $credentials
  */
-function accredibledashboard_get_credentials($group_id, $email= null) {
+function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5) {
     global $CFG;
 
     $page_size = 50;
@@ -49,12 +50,14 @@ function accredibledashboard_get_credentials($group_id, $email= null) {
         $loop = true;
         $count = 0;
         $credentials = array();
+        $allcredentials = array();
         // Query the Accredible API and loop until it returns that there is no next page.
         while ($loop === true) {
             $credentials_page = $api->get_credentials($group_id, $email, $page_size, $page);
 
             foreach ($credentials_page->credentials as $credential) {
-                $credentials[] = $credential;
+                // The key is saved as the credential id to aid sorting.
+                $allcredentials[$credential->id] = $credential;
             }
 
             $page++;
@@ -65,7 +68,15 @@ function accredibledashboard_get_credentials($group_id, $email= null) {
                 // is no next page, end the loop.
                 $loop = false;
             }
-         }
+        }
+
+        // Order the credentials by date.
+        // The credential id is a cheap way to order by issue date.
+        krsort($allcredentials);
+
+        // Limit the number of returned credentials.
+        $credentials = array_slice($allcredentials, 0, $limit);
+
         return $credentials;
 	} catch (ClientException $e) {
 	    // throw API exception

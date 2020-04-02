@@ -76,8 +76,12 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
         krsort($allcredentials);
 
         // Limit the number of returned credentials.
-        $credentials = array_slice($allcredentials, 0, $limit);
-
+        if ($limit < count($allcredentials)) {
+            $credentials = array_slice($allcredentials, 0, $limit);
+        } else {
+            $credentials = $allcredentials;
+        }
+        
         // Get the wallet url.
         $link = $api->recipient_sso_link(null, null, $email, true, $group_id, $redirecturl);
         $walleturl = $link->link;

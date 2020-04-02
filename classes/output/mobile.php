@@ -59,7 +59,7 @@ class mobile {
 
         $data = array(
             'credentials' => $credentials,
-            'wallet' => $wallet;
+            'wallet' => $wallet
         );
 
         $html = '';

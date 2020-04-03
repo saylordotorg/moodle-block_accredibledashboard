@@ -102,7 +102,9 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
         $exceptionparam = new stdClass();
         $exceptionparam->group_id = $group_id;
         $exceptionparam->email = $email;
-        $exceptionparam->last_response = $credentials_page;
+        $exceptionparam->last_response->credentials = $credentials_page;
+        $exceptionparam->last_response->walletsso = $walletlink;
+        $exceptionparam->last_response->certificatesso = $certificatessolink;
 	  	throw new moodle_exception('getcredentialserror', 'accredible', 'https://help.accredible.com/hc/en-us', $exceptionparam);
 	}
 }

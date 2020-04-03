@@ -82,15 +82,19 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
             $credentials = $allcredentials;
         }
         
-        // Get the wallet url.
-        $link = $api->recipient_sso_link(null, null, $email, true, $group_id, $redirecturl);
-        $walleturl = $link->link;
+        if (!empty($credentials)) {
+            // Only get SSO information if a user has credentials.
 
-        // Get the SSO link for these credentials and attach wallet url.
-        foreach ($credentials as $credential) {
-            $link = $api->recipient_sso_link($credential->id, null, null, null, null, $redirecturl);
-            $credentials[$credential->id]->sso_url = $link->link;
-            $credentials[$credential->id]->wallet_url = $walleturl;
+            // Get the wallet url.
+            $walletlink = $api->recipient_sso_link(null, null, $email, true, null, $redirecturl);
+            $walleturl = $walletlink->link;
+
+            // Get the SSO link for these credentials and attach wallet url.
+            foreach ($credentials as $credential) {
+                $certificatessolink = $api->recipient_sso_link($credential->id, null, null, null, null, $redirecturl);
+                $credentials[$credential->id]->sso_url = $certificatessolink->link;
+                $credentials[$credential->id]->wallet_url = $walleturl;
+            }
         }
 
         return $credentials;

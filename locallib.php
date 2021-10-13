@@ -46,7 +46,7 @@ function accredibledashboard_get_credentials($group_id, $email= null, $limit = 5
     $timeout = 15;
     $starttime = time();
 
-    $api = new apiRest($CFG->accredible_api_key);
+    $api = new apiRest();
 
     try {
 
